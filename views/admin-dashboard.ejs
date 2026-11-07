@@ -1,0 +1,103 @@
+<%- include('partials/header', { title: 'Admin Dashboard' }) %>
+
+<div class="space-y-6">
+  <!-- Top Banner & Sub-nav -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-700">
+    <div>
+      <h1 class="text-2xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
+        <span>🛡️ Admin Dashboard</span>
+      </h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400">Campus Moderation & User Management</p>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <a href="/admin/confessions" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-sm transition">
+        Moderate Confessions (<%= stats.pendingConfessions %> pending)
+      </a>
+      <a href="/admin/users" class="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold shadow-sm transition">
+        Manage Users (<%= stats.totalUsers %>)
+      </a>
+    </div>
+  </div>
+
+  <!-- Key Metrics Stat Cards -->
+  <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+      <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Users</p>
+      <p class="text-2xl font-black text-slate-800 dark:text-white mt-1"><%= stats.totalUsers %></p>
+      <a href="/admin/users" class="text-xs text-blue-500 hover:underline mt-2 inline-block">View users &rarr;</a>
+    </div>
+
+    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+      <p class="text-xs font-semibold text-rose-500 uppercase tracking-wider">Banned Users</p>
+      <p class="text-2xl font-black text-rose-600 dark:text-rose-400 mt-1"><%= stats.bannedUsers %></p>
+      <span class="text-xs text-slate-400 mt-2 inline-block">IP / Email / Phone blocked</span>
+    </div>
+
+    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+      <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Posts</p>
+      <p class="text-2xl font-black text-slate-800 dark:text-white mt-1"><%= stats.totalConfessions %></p>
+      <span class="text-xs text-slate-400 mt-2 inline-block">All submissions</span>
+    </div>
+
+    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-amber-200 dark:border-amber-900 shadow-sm bg-amber-50/30 dark:bg-amber-950/20">
+      <p class="text-xs font-semibold text-amber-600 uppercase tracking-wider">Pending Review</p>
+      <p class="text-2xl font-black text-amber-600 dark:text-amber-400 mt-1"><%= stats.pendingConfessions %></p>
+      <a href="/admin/confessions?tab=pending" class="text-xs text-amber-600 hover:underline mt-2 inline-block">Review now &rarr;</a>
+    </div>
+
+    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-red-200 dark:border-red-900 shadow-sm bg-red-50/30 dark:bg-red-950/20">
+      <p class="text-xs font-semibold text-red-600 uppercase tracking-wider">Reported</p>
+      <p class="text-2xl font-black text-red-600 dark:text-red-400 mt-1"><%= stats.reportedConfessions %></p>
+      <a href="/admin/confessions?tab=reported" class="text-xs text-red-600 hover:underline mt-2 inline-block">Inspect flags &rarr;</a>
+    </div>
+  </div>
+
+  <!-- Recent Moderation Needs Quick Table -->
+  <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+    <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+      <h3 class="font-bold text-slate-800 dark:text-white">Recent Confessions Needing Attention</h3>
+      <a href="/admin/confessions" class="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline">View All Moderation &rarr;</a>
+    </div>
+
+    <div class="divide-y divide-slate-100 dark:divide-slate-700">
+      <% if (recentConfessions && recentConfessions.length > 0) { %>
+        <% recentConfessions.forEach(item => { %>
+          <div class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="space-y-1.5 flex-1">
+              <div class="flex items-center gap-2 text-xs">
+                <span class="font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"><%= item.category %></span>
+                <span class="text-slate-400">•</span>
+                <span class="font-semibold text-slate-700 dark:text-slate-300">Author: <%= item.author ? item.author.name + ' (@' + item.author.username + ')' : 'Unknown User' %></span>
+                <span class="text-slate-400">•</span>
+                <span class="text-slate-500"><%= item.author ? item.author.email : '' %></span>
+                <% if (item.reports && item.reports.length > 0) { %>
+                  <span class="px-2 py-0.5 rounded text-red-600 bg-red-100 dark:bg-red-950 font-bold"><%= item.reports.length %> Reports</span>
+                <% } %>
+              </div>
+              <p class="text-slate-800 dark:text-slate-200 text-sm whitespace-pre-wrap"><%= item.content %></p>
+            </div>
+
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <form action="/admin/confessions/<%= item._id %>/approve" method="POST" class="inline">
+                <button type="submit" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition">Approve</button>
+              </form>
+              <form action="/admin/confessions/<%= item._id %>/reject" method="POST" class="inline">
+                <button type="submit" class="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-semibold transition">Reject</button>
+              </form>
+              <form action="/admin/confessions/<%= item._id %>/delete" method="POST" class="inline" onsubmit="return confirm('Delete permanently?');">
+                <button type="submit" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold transition">Delete</button>
+              </form>
+            </div>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <div class="p-8 text-center text-sm text-slate-500 dark:text-slate-400">
+          All caught up! No confessions currently require moderation.
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

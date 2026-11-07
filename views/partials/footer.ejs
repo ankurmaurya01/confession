@@ -1,0 +1,47 @@
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 py-6 text-center text-sm text-slate-500 dark:text-slate-400">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p class="font-medium">Made for GL Bajaj students, for fun only. Not an official college platform.</p>
+      <div class="flex items-center gap-4 text-xs">
+        <a href="/" class="hover:underline">Home</a>
+        <span>•</span>
+        <a href="/admin/login" class="hover:underline">Admin Portal</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Dark Mode Switcher Script -->
+  <script>
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+    const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+    function updateIcons() {
+      if (document.documentElement.classList.contains('dark')) {
+        themeToggleLightIcon.classList.remove('hidden');
+        themeToggleDarkIcon.classList.add('hidden');
+      } else {
+        themeToggleLightIcon.classList.add('hidden');
+        themeToggleDarkIcon.classList.remove('hidden');
+      }
+    }
+
+    updateIcons();
+
+    if (themeToggleBtn) {
+      themeToggleBtn.addEventListener('click', function () {
+        if (document.documentElement.classList.contains('dark')) {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+        } else {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+        }
+        updateIcons();
+      });
+    }
+  </script>
+</body>
+</html>

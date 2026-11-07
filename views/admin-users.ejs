@@ -1,0 +1,130 @@
+<%- include('partials/header', { title: 'Manage Users' }) %>
+
+<div class="space-y-6">
+  <!-- Nav header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-700">
+    <div>
+      <h1 class="text-2xl font-extrabold text-slate-800 dark:text-white">Registered Users</h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400">View college student details, IPs, and ban malicious accounts</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="/admin" class="px-3.5 py-1.5 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+        &larr; Back to Dashboard
+      </a>
+      <a href="/admin/confessions" class="px-3.5 py-1.5 bg-blue-600 text-white rounded-xl text-xs font-semibold hover:bg-blue-700 transition">
+        Moderate Confessions
+      </a>
+    </div>
+  </div>
+
+  <% if (typeof success !== 'undefined' && success) { %>
+    <div class="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 rounded-xl text-sm">
+      <%= success %>
+    </div>
+  <% } %>
+
+  <!-- Search Bar -->
+  <form action="/admin/users" method="GET" class="flex gap-2">
+    <input type="text" name="search" value="<%= search || '' %>"
+      placeholder="Search by name, username, email, phone, roll no., or IP..."
+      class="flex-1 px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition">
+      Search
+    </button>
+    <% if (search) { %>
+      <a href="/admin/users" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-sm font-semibold hover:bg-slate-300 transition flex items-center">
+        Clear
+      </a>
+    <% } %>
+  </form>
+
+  <!-- Users Table -->
+  <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-x-auto">
+    <table class="w-full text-left text-xs">
+      <thead class="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 uppercase font-semibold border-b border-slate-200 dark:border-slate-700">
+        <tr>
+          <th class="py-3 px-4">Student</th>
+          <th class="py-3 px-4">Contact</th>
+          <th class="py-3 px-4">Roll / Class</th>
+          <th class="py-3 px-4">IP Addresses</th>
+          <th class="py-3 px-4">Joined</th>
+          <th class="py-3 px-4">Status</th>
+          <th class="py-3 px-4 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100 dark:divide-slate-700 text-slate-700 dark:text-slate-300">
+        <% if (users && users.length > 0) { %>
+          <% users.forEach(user => { %>
+            <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30">
+              <td class="py-3 px-4">
+                <div class="font-bold text-slate-900 dark:text-white text-sm"><%= user.name %></div>
+                <div class="text-slate-400 font-mono">@<%= user.username %></div>
+                <% if (user.role === 'admin') { %>
+                  <span class="inline-block mt-0.5 px-1.5 py-0.2 rounded text-[10px] font-bold bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">ADMIN</span>
+                <% } %>
+              </td>
+              <td class="py-3 px-4">
+                <div><%= user.email %></div>
+                <div class="text-slate-400"><%= user.mobile %></div>
+              </td>
+              <td class="py-3 px-4">
+                <span class="font-medium"><%= user.rollNumber || '—' %></span>
+              </td>
+              <td class="py-3 px-4 font-mono text-[11px]">
+                <div><span class="text-slate-400">Reg:</span> <%= user.signupIp || '—' %></div>
+                <div><span class="text-slate-400">Last:</span> <%= user.lastLoginIp || '—' %></div>
+              </td>
+              <td class="py-3 px-4 text-slate-400">
+                <%= new Date(user.createdAt).toLocaleDateString('en-IN') %>
+              </td>
+              <td class="py-3 px-4">
+                <% if (user.isBanned) { %>
+                  <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300">
+                    Banned
+                  </span>
+                  <div class="text-[10px] text-red-500 mt-1 max-w-[120px] truncate" title="<%= user.banReason %>">
+                    <%= user.banReason || 'Rule violation' %>
+                  </div>
+                <% } else { %>
+                  <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                    Active
+                  </span>
+                <% } %>
+              </td>
+              <td class="py-3 px-4 text-right">
+                <% if (user.role !== 'admin') { %>
+                  <% if (user.isBanned) { %>
+                    <form action="/admin/users/<%= user._id %>/unban" method="POST" class="inline">
+                      <button type="submit" class="px-3 py-1 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-700 dark:text-slate-200 rounded-lg font-semibold transition">
+                        Unban
+                      </button>
+                    </form>
+                  <% } else { %>
+                    <!-- Ban modal / quick prompt trigger -->
+                    <form action="/admin/users/<%= user._id %>/ban" method="POST" class="inline flex items-center justify-end gap-1"
+                          onsubmit="const reason = prompt('Reason for banning <%= user.username %>? (Blocks this email, phone, and IP):'); if (!reason) return false; this.reason.value = reason;">
+                      <input type="hidden" name="reason" value="">
+                      <button type="submit" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition">
+                        Ban User
+                      </button>
+                    </form>
+                  <% } %>
+                <% } else { %>
+                  <span class="text-slate-400 italic">Protected</span>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="7" class="py-8 text-center text-slate-500 dark:text-slate-400">
+              No users found matching query.
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

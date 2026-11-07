@@ -1,0 +1,154 @@
+<%- include('partials/header', { title: 'Campus Feed' }) %>
+
+<div class="max-w-3xl mx-auto space-y-6">
+  <!-- Alerts -->
+  <% if (typeof success !== 'undefined' && success) { %>
+    <div class="p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 rounded-2xl text-sm flex items-center gap-2">
+      <svg class="w-5 h-5 flex-shrink-0 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+      </svg>
+      <span><%= success %></span>
+    </div>
+  <% } %>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="p-4 bg-red-50 dark:bg-red-950/40 border border-red-300 dark:border-red-800 text-red-800 dark:text-red-300 rounded-2xl text-sm flex items-center gap-2">
+      <svg class="w-5 h-5 flex-shrink-0 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+      </svg>
+      <span><%= error %></span>
+    </div>
+  <% } %>
+
+  <!-- Post Confession Box -->
+  <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+        <span>🤫 Drop a Confession</span>
+      </h2>
+      <span class="text-xs text-slate-400 bg-slate-100 dark:bg-slate-700 px-2.5 py-1 rounded-full font-medium">100% Anonymous Publicly</span>
+    </div>
+
+    <% if (currentUser) { %>
+      <form action="/confessions" method="POST" class="space-y-3">
+        <div class="relative">
+          <textarea name="content" id="confession-text" rows="3" maxlength="500" required
+            placeholder="What's happening on campus? Spill the tea..."
+            class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"></textarea>
+          <div class="text-right text-xs text-slate-400 mt-1">
+            <span id="char-count">0</span> / 500 characters
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+          <div class="flex items-center gap-2">
+            <label class="text-xs font-semibold text-slate-600 dark:text-slate-300">Category:</label>
+            <select name="category" class="text-xs px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="Campus Life">Campus Life</option>
+              <option value="Love">Love</option>
+              <option value="Funny">Funny</option>
+              <option value="Secret">Secret</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <button type="submit"
+            class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-sm transition">
+            Post Anonymously
+          </button>
+        </div>
+      </form>
+      <script>
+        const textarea = document.getElementById('confession-text');
+        const charCount = document.getElementById('char-count');
+        if (textarea && charCount) {
+          textarea.addEventListener('input', () => {
+            charCount.textContent = textarea.value.length;
+          });
+        }
+      </script>
+    <% } else { %>
+      <div class="text-center py-6 bg-slate-50 dark:bg-slate-700/40 rounded-xl border border-dashed border-slate-300 dark:border-slate-600">
+        <p class="text-sm text-slate-600 dark:text-slate-300 mb-3">You need to log in to post a confession.</p>
+        <div class="flex items-center justify-center gap-3">
+          <a href="/login" class="px-4 py-1.5 text-xs font-semibold bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Log In</a>
+          <a href="/signup" class="px-4 py-1.5 text-xs font-semibold border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition">Sign Up</a>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Category Filter Pill Bar -->
+  <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider mr-1">Filter:</span>
+    <% const categories = ['All', 'Campus Life', 'Love', 'Funny', 'Secret', 'Other']; %>
+    <% categories.forEach(cat => { %>
+      <a href="/?category=<%= encodeURIComponent(cat) %>"
+        class="px-3.5 py-1.5 rounded-full text-xs font-medium transition whitespace-nowrap <%= currentCategory === cat ? 'bg-blue-600 text-white shadow-sm' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700' %>">
+        <%= cat %>
+      </a>
+    <% }) %>
+  </div>
+
+  <!-- Feed List -->
+  <div class="space-y-4">
+    <% if (confessions && confessions.length > 0) { %>
+      <% confessions.forEach(item => { %>
+        <article class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
+          <!-- Top metadata -->
+          <div class="flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2.5 py-0.5 rounded-full">
+                <%= item.category %>
+              </span>
+              <span class="text-slate-400">•</span>
+              <span class="text-slate-500 dark:text-slate-400 font-medium">Anonymous Student</span>
+            </div>
+            <time class="text-slate-400">
+              <%= new Date(item.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+            </time>
+          </div>
+
+          <!-- Content (Safely escaped by EJS) -->
+          <p class="text-slate-800 dark:text-slate-100 text-base leading-relaxed whitespace-pre-wrap">
+            <%= item.content %>
+          </p>
+
+          <!-- Action Buttons -->
+          <div class="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-700/60 text-xs text-slate-500 dark:text-slate-400">
+            <!-- Like Form -->
+            <form action="/confessions/<%= item._id %>/like" method="POST" class="inline">
+              <% const hasLiked = currentUser && item.likes && item.likes.some(id => id.toString() === currentUser._id.toString()); %>
+              <button type="submit"
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition <%= hasLiked ? 'text-rose-600 bg-rose-50 dark:bg-rose-950/40 font-bold' : 'hover:bg-slate-100 dark:hover:bg-slate-700' %>">
+                <svg class="w-4 h-4 <%= hasLiked ? 'fill-current' : 'fill-none stroke-current stroke-2' %>" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+                <span><%= (item.likes && item.likes.length) || 0 %> Likes</span>
+              </button>
+            </form>
+
+            <!-- Report Button -->
+            <form action="/confessions/<%= item._id %>/report" method="POST" class="inline" onsubmit="return confirm('Report this confession for violating guidelines?');">
+              <button type="submit"
+                class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                <span>Report</span>
+              </button>
+            </form>
+          </div>
+        </article>
+      <% }) %>
+    <% } else { %>
+      <div class="text-center py-16 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700">
+        <p class="text-4xl mb-3">🍃</p>
+        <h3 class="text-lg font-bold text-slate-800 dark:text-white">No confessions yet</h3>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Be the first to share something in <%= currentCategory %>!</p>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

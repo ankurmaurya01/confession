@@ -1,0 +1,95 @@
+<%- include('partials/header', { title: 'Sign Up' }) %>
+
+<div class="max-w-lg mx-auto bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-md border border-slate-200 dark:border-slate-700 my-4">
+  <div class="text-center mb-6">
+    <h1 class="text-2xl font-extrabold text-slate-800 dark:text-white">Join GL Bajaj Confessions</h1>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Share your thoughts anonymously across campus</p>
+  </div>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="mb-5 p-3.5 bg-red-50 dark:bg-red-950/50 border border-red-300 dark:border-red-800 text-red-700 dark:text-red-300 rounded-xl text-sm flex items-center gap-2">
+      <svg class="w-5 h-5 flex-shrink-0 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+      </svg>
+      <span><%= error %></span>
+    </div>
+  <% } %>
+
+  <form action="/signup" method="POST" class="space-y-4">
+    <div>
+      <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">Full Name</label>
+      <input type="text" name="name" required value="<%= typeof formData !== 'undefined' ? formData.name || '' : '' %>"
+        placeholder="e.g. Rahul Sharma"
+        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+    </div>
+
+    <div>
+      <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">Username</label>
+      <input type="text" name="username" required value="<%= typeof formData !== 'undefined' ? formData.username || '' : '' %>"
+        placeholder="rahul_glb"
+        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">Personal Email</label>
+        <input type="email" name="email" required value="<%= typeof formData !== 'undefined' ? formData.email || '' : '' %>"
+          placeholder="rahul@gmail.com"
+          class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+        <p class="text-[11px] text-slate-400 mt-1">No disposable domains allowed</p>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">Mobile Number</label>
+        <input type="tel" name="mobile" required pattern="[6-9][0-9]{9}" value="<%= typeof formData !== 'undefined' ? formData.mobile || '' : '' %>"
+          placeholder="10 digits (starts with 6-9)"
+          class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+        <p class="text-[11px] text-slate-400 mt-1">10 digits starting with 6-9</p>
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">Class / Roll Number <span class="text-slate-400 font-normal">(Optional)</span></label>
+      <input type="text" name="rollNumber" value="<%= typeof formData !== 'undefined' ? formData.rollNumber || '' : '' %>"
+        placeholder="e.g. 2101920100055 or CSE-3B"
+        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">Password</label>
+        <input type="password" name="password" required minlength="6"
+          placeholder="••••••••"
+          class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">Confirm Password</label>
+        <input type="password" name="confirmPassword" required minlength="6"
+          placeholder="••••••••"
+          class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+      </div>
+    </div>
+
+    <!-- Mandatory checkbox -->
+    <div class="pt-2">
+      <label class="flex items-start gap-2.5 cursor-pointer">
+        <input type="checkbox" name="adminNotice" required class="mt-1 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+        <span class="text-xs text-slate-600 dark:text-slate-300 leading-snug">
+          I understand the admin can see my account details (to prevent harassment & maintain college harmony).
+        </span>
+      </label>
+    </div>
+
+    <button type="submit"
+      class="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-sm transition mt-2">
+      Create Account
+    </button>
+  </form>
+
+  <p class="text-center text-xs text-slate-500 dark:text-slate-400 mt-6">
+    Already have an account?
+    <a href="/login" class="text-blue-600 dark:text-blue-400 font-semibold hover:underline">Log in here</a>
+  </p>
+</div>
+
+<%- include('partials/footer') %>

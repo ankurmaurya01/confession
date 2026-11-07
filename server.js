@@ -109,6 +109,7 @@ app.use(async (req, res, next) => {
 });
 
 // Session Middleware with MongoStore (stateless serverless compatible)
+const isProduction = process.env.NODE_ENV === 'production';
 app.use(
   session({
     secret: SESSION_SECRET,
@@ -125,7 +126,8 @@ app.use(
     cookie: {
       maxAge: 14 * 24 * 60 * 60 * 1000,
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production'
+      secure: isProduction,
+      sameSite: 'lax'
     }
   })
 );

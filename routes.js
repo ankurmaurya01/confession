@@ -427,10 +427,17 @@ router.post('/admin/login', async (req, res) => {
     req.session.role = 'admin';
     req.session.isBanned = false;
 
-    res.redirect('/admin');
+    // Explicitly save session before redirecting (essential for serverless Vercel)
+    req.session.save((saveErr) => {
+      if (saveErr) {
+        console.error('Session save error:', saveErr);
+        return res.status(500).render('admin-login', { error: 'Failed to create admin session: ' + saveErr.message });
+      }
+      res.redirect('/admin');
+    });
   } catch (err) {
     console.error('Admin login error:', err);
-    res.status(500).render('admin-login', { error: 'Server error during admin login.' });
+    res.status(500).render('admin-login', { error: 'Server error during admin login: ' + (err.message || 'Unknown error') });
   }
 });
 

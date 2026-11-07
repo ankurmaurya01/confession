@@ -99,8 +99,13 @@ async function seedAdminUser() {
 
 // Ensure DB is connected for incoming requests (crucial for cold starts on Vercel)
 app.use(async (req, res, next) => {
-  await connectDB();
-  next();
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('Database connection middleware failed:', err.message);
+    res.status(500).send('Database connection error. Please verify your MONGODB_URI and Network Access settings in MongoDB Atlas.');
+  }
 });
 
 // Session Middleware with MongoStore (stateless serverless compatible)
@@ -110,7 +115,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl: MONGODB_URI,
+      clientPromise: mongoose.connection.asPromise().then(m => m.getClient()),
       collectionName: 'sessions',
       ttl: 14 * 24 * 60 * 60 // 14 days session
     }),

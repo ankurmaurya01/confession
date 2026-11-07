@@ -115,9 +115,12 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      clientPromise: mongoose.connection.asPromise().then(m => m.getClient()),
+      mongoUrl: MONGODB_URI,
       collectionName: 'sessions',
-      ttl: 14 * 24 * 60 * 60 // 14 days session
+      ttl: 14 * 24 * 60 * 60, // 14 days session
+      mongoOptions: {
+        serverSelectionTimeoutMS: 5000
+      }
     }),
     cookie: {
       maxAge: 14 * 24 * 60 * 60 * 1000,

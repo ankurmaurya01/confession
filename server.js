@@ -40,23 +40,26 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // MongoDB Connection Cache for Serverless environments (e.g. Vercel)
-let isConnectedBefore = false;
+let cachedConnectionPromise = null;
+
 async function connectDB() {
-  if (mongoose.connection.readyState >= 1) {
-    return;
+  if (mongoose.connection.readyState === 1) {
+    return mongoose.connection;
   }
-  try {
-    await mongoose.connect(MONGODB_URI, {
-      serverSelectionTimeoutMS: 5000
-    });
-    console.log('MongoDB connected successfully.');
-    if (!isConnectedBefore) {
+  if (!cachedConnectionPromise) {
+    cachedConnectionPromise = mongoose.connect(MONGODB_URI, {
+      serverSelectionTimeoutMS: 5000,
+      bufferCommands: false // Fail fast instead of buffering for 10000ms
+    }).then(async (m) => {
+      console.log('MongoDB connected successfully.');
       await seedAdminUser();
-      isConnectedBefore = true;
-    }
-  } catch (err) {
-    console.error('MongoDB connection error:', err.message);
+      return m;
+    }).catch(err => {
+      cachedConnectionPromise = null; // Reset so next request can retry
+      throw err;
+    });
   }
+  return cachedConnectionPromise;
 }
 
 // One-time startup/seed check for Admin account from environment variables

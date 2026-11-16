@@ -302,12 +302,12 @@ router.post('/confessions', requireAuth, async (req, res) => {
       content: content.trim(),
       category: chosenCategory,
       author: req.session.userId,
-      status: 'pending' // Goes to admin moderation
+      status: 'approved' // Automatically published without requiring admin approval
     });
 
     userLastPostTime.set(userId, now);
 
-    res.redirect('/my-confessions?success=Confession submitted! It will appear on the feed once reviewed by moderators.');
+    res.redirect('/?success=Confession posted successfully!');
   } catch (err) {
     console.error('Post confession error:', err);
     res.redirect('/?error=Could not submit confession. Please try again.');

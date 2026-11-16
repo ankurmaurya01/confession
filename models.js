@@ -36,7 +36,7 @@ const ConfessionSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ['pending', 'approved', 'rejected'],
-      default: 'pending'
+      default: 'approved'
     },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     reports: [

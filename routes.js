@@ -44,6 +44,7 @@ router.get('/', async (req, res) => {
     }
 
     const confessions = await Confession.find(filter)
+      .populate('author', 'username')
       .sort({ createdAt: -1 })
       .lean();
 

@@ -50,7 +50,7 @@
             </div>
 
             <time class="text-xs text-slate-400">
-              <%= new Date(item.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+              <%= new Date(item.createdAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }) %>
             </time>
           </div>
 

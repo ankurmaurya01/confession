@@ -89,7 +89,7 @@
           <!-- Moderation Actions Toolbar -->
           <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-700/60 text-xs">
             <div class="text-slate-400">
-              Submitted: <%= new Date(item.createdAt).toLocaleString('en-IN') %>
+              Submitted: <%= new Date(item.createdAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }) %>
             </div>
 
             <div class="flex flex-wrap items-center gap-2">

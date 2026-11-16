@@ -195,7 +195,13 @@ router.post('/signup', signupRateLimiter, async (req, res) => {
     req.session.role = newUser.role;
     req.session.isBanned = false;
 
-    res.redirect('/?success=Account created successfully! Welcome to GL Bajaj Confessions.');
+    // Explicitly save session before redirecting so user is logged in
+    req.session.save((saveErr) => {
+      if (saveErr) {
+        console.error('Signup session save error:', saveErr);
+      }
+      res.redirect('/?success=Account created successfully! Welcome to GL Bajaj Confessions.');
+    });
   } catch (err) {
     console.error('Signup error:', err);
     res.status(500).render('signup', {
